@@ -1,0 +1,23 @@
+{
+    "name": "cline",
+    "version": "0.0.1",
+    "description": "Command-line apps building library for Node",
+    "author": "Wolf Bas <becevka@kucoe.net>",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/kucoe/cline.git"
+    },
+    "engines": {"node": "node >= 0.10.x"},
+    "dependencies": {},
+    "devDependencies": {
+        "mocha": "*",
+        "should": "*"
+    },
+    "keywords": ["cli", "command line interface", "prompt", "readline"],
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "http://kucoe.mit-license.org/"
+        }
+    ]
+}
