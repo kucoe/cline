@@ -3,7 +3,7 @@ cline
 
 Command-line apps building library for Node.
 
-Based on readline Node module (http://nodejs.org/api/readline.html) and includes history, completions, prompt
+Based on Node module [readline](http://nodejs.org/api/readline.html) and includes history, completions, prompt
 and regex commands support.
 
 ## Installation
@@ -17,7 +17,7 @@ and regex commands support.
 ```
 
   If you need to provide your own command line interface,
-  you can pass it as parameter (visit https://github.com/kucoe/cline/blob/master/tests.js for mock example).
+  you can pass it as parameter, visit [tests.js]( https://github.com/kucoe/cline/blob/master/tests.js) for mock example.
 
 ```js
     var cli = require('cline')(mock);
