@@ -164,7 +164,7 @@ Cli.prototype.usage = function () {
     res += '\nhelp, \\? - print this usage';
     res += '\nclear, \\c - clear the terminal screen';
     this.stream.print(res);
-    this.emit('usage');
+    this.emit('usage', res);
     return res;
 };
 
