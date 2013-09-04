@@ -1,6 +1,6 @@
 if (module == require.main) {
     var mochaPath = 'node_modules/mocha/bin/mocha';
-    var args = [mochaPath, '--colors', '--require', 'should', '--reporter', 'spec', __filename];
+    var args = [mochaPath, '--colors', '--require', 'should', '--reporter', 'tap', __filename];
     var proc = require('child_process').spawn(process.argv[0], args, {stdio: 'inherit'});
     proc.on('close', function (code) {
         process.exit(code);
@@ -54,7 +54,7 @@ if (module == require.main) {
         }
     };
 
-    describe.only('cli', function () {
+    describe('cli', function () {
         afterEach(function () {
             cli.clean();
         });
@@ -91,7 +91,7 @@ if (module == require.main) {
             cli.stream.close = function () {
                 done();
             };
-            cli.interactive('i>');
+            cli.interact('i>');
         });
         it('should print usage by command', function () {
             cli.init(stream('\\?', ['i>', 'usage:\nstart - start command\nstop \n' +
@@ -144,6 +144,26 @@ if (module == require.main) {
             });
             cli.parse('#12x');
         });
+        it('should parse command medium declaration', function (done) {
+            cli.command('#aaa', 'do aaa', function (input) {
+                input.should.eql('#aaa', 'input');
+                done();
+            });
+            cli.command('*', function (input) {
+                throw new Error(input);
+            });
+            cli.parse('#aaa');
+        });
+        it('should parse command short declaration', function (done) {
+            cli.command('#aaa', function (input) {
+                input.should.eql('#aaa', 'input');
+                done();
+            });
+            cli.command('*', function (input) {
+                throw new Error(input);
+            });
+            cli.parse('#aaa');
+        });
         it('should parse command and return', function () {
             cli.command('#{number}{cmd}', 'task command by number', {number: '\\d{1,3}', cmd: 'x|\\+|-'}, function (input, args) {
                 args.number.should.eql(12, 'number');
@@ -154,6 +174,28 @@ if (module == require.main) {
                 throw new Error(input);
             });
             cli.parse('#12x').should.eql('cool', 'return');
+        });
+        it('should fire command', function (done) {
+            cli.command('{str}', '', {str:'[A-Za-z]+'});
+            cli.command('{number}', '', {number:'\\d+'});
+
+            cli.once('command', function(input, cmd) {
+                input.should.eql('aaaa', 'string');
+                cmd.should.eql('{str}', 'cmd');
+                done();
+            });
+            cli.parse('aaaa');
+        });
+        it('should match whole command', function (done) {
+            cli.command('{str}', '', {str:'[A-Za-z]+'});
+            cli.command('{str} {str}', '', {str:'\\w+'});
+
+            cli.once('command', function(input, cmd) {
+                cmd.should.eql('{str} {str}', 'cmd');
+                input.should.eql('aaaa bbb', 'string');
+                done();
+            });
+            cli.parse('aaaa bbb');
         });
         it('should override command', function (done) {
             cli.command('#{number}{cmd}', 'task command by number', {number: '\\d{1,3}', cmd: 'x|\\+|-'}, function () {
