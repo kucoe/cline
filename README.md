@@ -36,7 +36,7 @@ password, confirm, input mask and (most interesting) regexp commands support.
   *cmd* - could be simple name or any other string with arguments placeholders. For ex.
 
   ```js
-      cli.command('#{number}', '', {number: '\\d+'});
+    cli.command('#{number}', '', {number: '\\d+'});
   ```
   *{number}* is an argument placeholder literal that will be replaced with argument regexp
 
@@ -49,22 +49,22 @@ password, confirm, input mask and (most interesting) regexp commands support.
       it gets user input and matched arguments values as parameters.
       Could be empty if you need just to register command and listen later for 'command' event.
   ```js
-      cli.command('#{number}{cmd}', 'task command by number', {number: '\\d{1,3}', cmd: 'x|\\+|-'},
+    cli.command('#{number}{cmd}', 'task command by number', {number: '\\d{1,3}', cmd: 'x|\\+|-'},
       function (input, args) {
         args.number.should.eql(12, 'number');
         args.cmd.should.eql('x', 'command');
         done();
       });
-      cli.parse('#12x');
+    cli.parse('#12x');
   ```
   here '#{number}{cmd}' will be replaced into '^(\\d{1,3})(x|\\+|-)$' regexp
 
   additionally you can register 'match all' command using '*' to react on any input,
   though this match will not invoke 'command' event.
   ```js
-      cli.command('*', function (input) {
-        console.log(input + 'is not good, type "help" for more info');
-      });
+    cli.command('*', function (input) {
+      console.log(input + 'is not good, type "help" for more info');
+    });
   ```
   this method have 2 short forms: name with callback only and name with description and callback.
 
