@@ -31,21 +31,21 @@ password, confirm, input mask and (most interesting) regexp commands support.
 
 ### Methods
 
-  _command(cmd, description, args, callback)_ - adds command to match user input with.
+  __command(cmd, description, args, callback)__ - adds command to match user input with.
 
-    *cmd* - could be simple name or any other string with arguments placeholders. For ex.
+  *cmd* - could be simple name or any other string with arguments placeholders. For ex.
 
   ```js
       cli.command('#{number}', '', {number: '\\d+'});
   ```
   *{number}* is an argument placeholder literal that will be replaced with argument regexp
 
-    *description* - command description used for help output
+  *description* - command description used for help output
 
-    *args* - object containing argument name as key and valid regexp as value to form command matching pattern.
+  *args* - object containing argument name as key and valid regexp as value to form command matching pattern.
       Arguments should be unique and follow placeholders order
 
-    *callback* - is function to be called when command is matched,
+  *callback* - is function to be called when command is matched,
       it gets user input and matched arguments values as parameters.
       Could be empty if you need just to register command and listen later for 'command' event.
   ```js
@@ -57,41 +57,41 @@ password, confirm, input mask and (most interesting) regexp commands support.
       });
       cli.parse('#12x');
   ```
-    here '#{number}{cmd}' will be replaced into '^(\\d{1,3})(x|\\+|-)$' regexp
+  here '#{number}{cmd}' will be replaced into '^(\\d{1,3})(x|\\+|-)$' regexp
 
-    additionally you can register 'match all' command using '*' to react on any input,
-    though this match will not invoke 'command' event.
+  additionally you can register 'match all' command using '*' to react on any input,
+  though this match will not invoke 'command' event.
   ```js
       cli.command('*', function (input) {
         console.log(input + 'is not good, type "help" for more info');
       });
   ```
-    this method have 2 short forms: name with callback only and name with description and callback.
+  this method have 2 short forms: name with callback only and name with description and callback.
 
   ```js
     cli.command('my_command', function(){});
     cli.command('my_command', 'do it', function(){});
   ```
 
-  _init(stream)_ - reinitialize cli with different input output streams interface
+  __init(stream)__ - reinitialize cli with different input output streams interface
 
-  _usage_ - prints and returns help message
+  __usage__ - prints and returns help message
 
-  _history(items)_ - if items are specified updates history in reverse order, else returns collected history items
+  __history(items)__ - if items are specified updates history in reverse order, else returns collected history items
 
-  _parse(string)_ - parses user input string for matched commands
+  __parse(string)__ - parses user input string for matched commands
 
-  _prompt(string, callback)_ - prompts with string specified and returns user input into callback.
+  __prompt(string, callback)__ - prompts with string specified and returns user input into callback.
       If callback function is not specified calls parse function
 
-  _password(string, mask, callback)_ - prompts with string specified for password and returns user input into callback.
+  __password(string, mask, callback)__ - prompts with string specified for password and returns user input into callback.
           If mask specified - hide input behind mask symbols. If mask not specified use empty symbol.
           If callback function is not specified calls parse function
 
-  _confirm(string, callback)_ - asks user for confirmation with string specified and returns user input (converted to boolean) into callback.
+  __confirm(string, callback)__ - asks user for confirmation with string specified and returns user input (converted to boolean) into callback.
           If callback function is not specified calls parse function
 
-  _interact(string)_ - start interactive prompt for user input. Every input is parsed for matching command and prompt again.
+  __interact(string)__ - start interactive prompt for user input. Every input is parsed for matching command and prompt again.
           Calling this method second time with different string will replace prompt string.
 
 ### System commands
