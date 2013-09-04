@@ -31,18 +31,19 @@ password, confirm, input mask and (most interesting) regexp commands support.
 
 ### Methods
 
-  command(cmd, description, args, callback) - adds command to match user input with.
+  *command(cmd, description, args, callback)* - adds command to match user input with.
+
     cmd - could be simple name or any other string with arguments placeholders. For ex.
 
-    ```js
-        cli.command('#{number}', '', {number: '\\d+'});
-    ```
-    {number} is an argument placeholder literal that will be replaced with argument regexp
+  ```js
+      cli.command('#{number}', '', {number: '\\d+'});
+  ```
+  {number} is an argument placeholder literal that will be replaced with argument regexp
 
     description - command description used for help output
 
     args - object containing argument name as key and valid regexp as value to form command matching pattern. Arguments
-        should be unique and follow placeholders order
+      should be unique and follow placeholders order
 
     callback - is function to be called when command is matched, it gets user input and matched arguments values as parameters.
       Could be empty if you need just to register command and listen later for 'command' event.
@@ -70,9 +71,9 @@ password, confirm, input mask and (most interesting) regexp commands support.
     cli.command('my_command', 'do it', function(){});
   ```
 
-  init(stream) - reinitialize cli with different input output streams interface
+  *init(stream)* - reinitialize cli with different input output streams interface
 
-  usage - prints and returns help message
+  *usage* - prints and returns help message
 
   history(items) - if items are specified updates history in reverse order, else returns collected history items
 
