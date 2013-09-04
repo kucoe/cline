@@ -12,15 +12,22 @@ and regex commands support.
 
 ## Usage
 
+```node
     require('cline')();
+```
 
-  If you need to provide your own command line interface, you can pass it as parameter (visit test.js for mock example).
+  If you need to provide your own command line interface,
+  you can pass it as parameter (visit https://github.com/kucoe/cline/blob/master/tests.js for mock example).
 
+```node
     var cli = require('cline')(mock);
+```
 
   Passing second parameter allows to get direct commands access and clean function (for test purposes)
 
+```node
     var cli = require('cline')(mock, true);
+```
 
 ### Methods
 
@@ -50,6 +57,7 @@ and regex commands support.
 
 ## Example
 
+```node
     var cli = require('cline')();
 
     cli.command('start', 'starts program', function () {
@@ -85,6 +93,7 @@ and regex commands support.
         console.log('History:' + cli.history());
         process.exit();
     });
+```
 
 
 ## License
