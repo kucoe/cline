@@ -31,21 +31,22 @@ password, confirm, input mask and (most interesting) regexp commands support.
 
 ### Methods
 
-  *command(cmd, description, args, callback)* - adds command to match user input with.
+  _command(cmd, description, args, callback)_ - adds command to match user input with.
 
-    cmd - could be simple name or any other string with arguments placeholders. For ex.
+    *cmd* - could be simple name or any other string with arguments placeholders. For ex.
 
   ```js
       cli.command('#{number}', '', {number: '\\d+'});
   ```
-  {number} is an argument placeholder literal that will be replaced with argument regexp
+  *{number}* is an argument placeholder literal that will be replaced with argument regexp
 
-    description - command description used for help output
+    *description* - command description used for help output
 
-    args - object containing argument name as key and valid regexp as value to form command matching pattern. Arguments
-      should be unique and follow placeholders order
+    *args* - object containing argument name as key and valid regexp as value to form command matching pattern.
+      Arguments should be unique and follow placeholders order
 
-    callback - is function to be called when command is matched, it gets user input and matched arguments values as parameters.
+    *callback* - is function to be called when command is matched,
+      it gets user input and matched arguments values as parameters.
       Could be empty if you need just to register command and listen later for 'command' event.
   ```js
       cli.command('#{number}{cmd}', 'task command by number', {number: '\\d{1,3}', cmd: 'x|\\+|-'},
@@ -58,7 +59,8 @@ password, confirm, input mask and (most interesting) regexp commands support.
   ```
     here '#{number}{cmd}' will be replaced into '^(\\d{1,3})(x|\\+|-)$' regexp
 
-    additionally you can register 'match all' command using '*' to react on any input, though this match will not invoke 'command' event.
+    additionally you can register 'match all' command using '*' to react on any input,
+    though this match will not invoke 'command' event.
   ```js
       cli.command('*', function (input) {
         console.log(input + 'is not good, type "help" for more info');
@@ -71,25 +73,25 @@ password, confirm, input mask and (most interesting) regexp commands support.
     cli.command('my_command', 'do it', function(){});
   ```
 
-  *init(stream)* - reinitialize cli with different input output streams interface
+  _init(stream)_ - reinitialize cli with different input output streams interface
 
-  *usage* - prints and returns help message
+  _usage_ - prints and returns help message
 
-  history(items) - if items are specified updates history in reverse order, else returns collected history items
+  _history(items)_ - if items are specified updates history in reverse order, else returns collected history items
 
-  parse(string) - parses user input string for matched commands
+  _parse(string)_ - parses user input string for matched commands
 
-  prompt(string, callback) - prompts with string specified and returns user input into callback.
+  _prompt(string, callback)_ - prompts with string specified and returns user input into callback.
       If callback function is not specified calls parse function
 
-  password(string, mask, callback) - prompts with string specified for password and returns user input into callback.
+  _password(string, mask, callback)_ - prompts with string specified for password and returns user input into callback.
           If mask specified - hide input behind mask symbols. If mask not specified use empty symbol.
           If callback function is not specified calls parse function
 
-  confirm(string, callback) - asks user for confirmation with string specified and returns user input (converted to boolean) into callback.
+  _confirm(string, callback)_ - asks user for confirmation with string specified and returns user input (converted to boolean) into callback.
           If callback function is not specified calls parse function
 
-  interact(string) - start interactive prompt for user input. Every input is parsed for matching command and prompt again.
+  _interact(string)_ - start interactive prompt for user input. Every input is parsed for matching command and prompt again.
           Calling this method second time with different string will replace prompt string.
 
 ### System commands
