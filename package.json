@@ -1,6 +1,6 @@
 {
     "name": "cline",
-    "version": "0.0.1",
+    "version": "0.1",
     "description": "Command-line apps building library for Node",
     "author": "Wolf Bas <becevka@kucoe.net>",
     "repository": {
