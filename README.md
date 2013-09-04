@@ -22,11 +22,11 @@ and regex commands support.
 
     var cli = require('cline')(mock, true);
 
-  ### Methods
+### Methods
 
 
 
-  ### System commands
+### System commands
 
     clear or \c - clears the terminal screen
 
@@ -34,7 +34,7 @@ and regex commands support.
 
     exit or \q  - close shell and exit
 
-  ### Events
+### Events
 
     close - fires when interface is closed
 
