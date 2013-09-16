@@ -1,8 +1,9 @@
 {
     "name": "cline",
-    "version": "0.1",
+    "version": "0.2.0",
     "description": "Command-line apps building library for Node",
     "author": "Wolf Bas <becevka@kucoe.net>",
+    "main": "index.js",
     "repository": {
         "type": "git",
         "url": "git://github.com/kucoe/cline.git"
