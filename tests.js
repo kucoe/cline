@@ -164,6 +164,17 @@ if (module == require.main) {
             });
             cli.parse('#aaa');
         });
+        it('should respect empty string in command', function (done) {
+            cli.command('#{number}{cmd}', 'task command by number', {number: '\\d{1,3}', cmd: 'x|\\+|-|'}, function (input, args) {
+                args.number.should.eql(12, 'number');
+                args.cmd.should.eql('', 'command');
+                done();
+            });
+            cli.command('*', function (input) {
+                throw new Error(input);
+            });
+            cli.parse('#12');
+        });
         it('should parse command and return', function () {
             cli.command('#{number}{cmd}', 'task command by number', {number: '\\d{1,3}', cmd: 'x|\\+|-'}, function (input, args) {
                 args.number.should.eql(12, 'number');
