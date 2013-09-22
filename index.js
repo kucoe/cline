@@ -244,6 +244,7 @@ Cli.prototype.command = function (cmd, desc, args, fn) {
         args = {};
     }
     var p = cmd;
+    p = p.replace('?', '\\?').replace('$', '\\$').replace('+', '\\+').replace('^', '\\^').replace('*', '\\*');
     for (var prop in args) {
         if (args.hasOwnProperty(prop)) {
             var regex = new RegExp('{' + prop + '}', 'g');
@@ -267,8 +268,18 @@ Cli.prototype.parse = function (str) {
             for (var p in val.args) {
                 if (val.args.hasOwnProperty(p)) {
                     var s = matches.shift();
-                    s = convert(s);
+                    if(s){
+                        s = convert(s);
+                    }
                     args[p] = s;
+                    var r = val.args[p];
+                    if(r.indexOf(')') != -1) {
+			for(var i = 0; i < r.length; i++) {
+			    if(r.charAt(i) == ')') {
+			        matches.shift();
+                            }	
+			} 
+                    }
                 }
             }
             var fn = val.listener;
@@ -303,6 +314,3 @@ module.exports = function (stream, tests) {
     }
     return cli;
 };
-
-
-

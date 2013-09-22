@@ -175,6 +175,28 @@ if (module == require.main) {
             });
             cli.parse('#12');
         });
+	it('should respect special chars', function (done) {
+            cli.command('?{number}+{cmd}$', 'task command by number', {number: '\\d{1,3}', cmd: 'x|\\+|-|'}, function (input, args) {
+                args.number.should.eql(12, 'number');
+                args.cmd.should.eql('x', 'command');
+                done();
+            });
+            cli.command('*', function (input) {
+                throw new Error(input);
+            });
+            cli.parse('?12+x$');
+        });
+	it('should respect inner groups', function (done) {
+            cli.command('?{numbers}{cmd}', 'task command by numbers', {numbers: '((\\d)+,?)+', cmd:'x|>|<'}, function (input, args) {
+                args.numbers.should.eql('12,3', 'numbers');
+		args.cmd.should.eql('>', 'command');
+                done();
+            });
+            cli.command('*', function (input) {
+                throw new Error(input);
+            });
+            cli.parse('?12,3>');
+        });
         it('should parse command and return', function () {
             cli.command('#{number}{cmd}', 'task command by number', {number: '\\d{1,3}', cmd: 'x|\\+|-'}, function (input, args) {
                 args.number.should.eql(12, 'number');
