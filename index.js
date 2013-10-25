@@ -268,23 +268,23 @@ Cli.prototype.parse = function (str) {
             for (var p in val.args) {
                 if (val.args.hasOwnProperty(p)) {
                     var s = matches.shift();
-                    if(s){
+                    if (s) {
                         s = convert(s);
                     }
                     args[p] = s;
                     var r = val.args[p];
-                    if(r.indexOf(')') != -1) {
-			for(var i = 0; i < r.length; i++) {
-			    if(r.charAt(i) == ')') {
-			        matches.shift();
-                            }	
-			} 
+                    if (r.indexOf(')') != -1) {
+                        for (var i = 0; i < r.length; i++) {
+                            if (r.charAt(i) == ')') {
+                                matches.shift();
+                            }
+                        }
                     }
                 }
             }
             var fn = val.listener;
             resp = (fn ? fn(main, args) : true) || true;
-            self.emit('command', main, val.cmd);
+            self.emit('command', main, val.cmd, args);
             return false;
         }
         return true;
