@@ -26,8 +26,6 @@ var Commands = function () {
     };
 };
 
-var commands = new Commands();
-
 var command = function (cmd, desc, args, fn) {
     this.cmd = cmd;
     if (typeof desc == 'function') {
@@ -49,32 +47,19 @@ var defaultFn = function (val, fn) {
     } else if ('\\c' === val || 'clear' === val) {
         this.stream.write(null, {ctrl: true, name: 'l'});
     }
-    fn ? fn(val) : this.parse(val);
+    fn ? fn.call(this, val) : this.parse(val);
 };
 
-var nextTick = function (cli, str, mask, fn) {
-    var next = cli._nextTick;
+var nextTick = function (str, mask, fn) {
     var cb = function () {
-        cli.ask(str, mask, function (line) {
+        this.ask(str, mask, function (line) {
             fn(line);
-            if (next) {
-                cli._nextTick = next;
-                next();
+            if (typeof this._nextTick == 'function') {
+                this._nextTick();
             }
         });
     };
-    next ? cli._nextTick = cb : cb();
-};
-
-var completer = function (line) {
-    var completions = commands.map(function (prop, val) {
-        return val.cmd;
-    });
-    completions.unshift('help', '\\?', 'clear', '\\c', 'exit', '\\q');
-    var hits = completions.filter(function (c) {
-        return c.indexOf(line) == 0
-    });
-    return [hits.length ? hits : completions, line]
+    cb.call(this);
 };
 
 var convert = function (string, context) {
@@ -108,6 +93,16 @@ var convert = function (string, context) {
 };
 
 var defaultStream = function () {
+    var completer = function (line) {
+        var completions = this.commands.map(function (prop, val) {
+            return val.cmd;
+        });
+        completions.unshift('help', '\\?', 'clear', '\\c', 'exit', '\\q');
+        var hits = completions.filter(function (c) {
+            return c.indexOf(line) == 0
+        });
+        return [hits.length ? hits : completions, line]
+    }.bind(this);
     var stream = require('readline').createInterface(process.stdin, process.stdout, completer, true);
     stream.print = function (msg) {
         console.log(msg);
@@ -128,15 +123,13 @@ var defaultStream = function () {
 var Cli = function (stream) {
     this.init(stream);
     EventEmitter.call(this);
+    this.commands = new Commands();
 };
 
 require('util').inherits(Cli, EventEmitter);
 
 Cli.prototype.init = function (stream) {
-    if (this.stream) {
-        this.stream.removeAllListeners('close');
-        this.stream.removeAllListeners('line');
-    }
+    var old = this.stream;
     if (!stream) {
         stream = defaultStream.call(this);
     }
@@ -151,11 +144,18 @@ Cli.prototype.init = function (stream) {
             self.fn(line);
         }
     });
+    if (old) {
+        process.nextTick(function () {
+            old.emit('line', '\n');
+            old.removeAllListeners('close');
+            old.removeAllListeners('line');
+        });
+    }
 };
 
 Cli.prototype.usage = function () {
     var res = 'usage:';
-    commands.map(function (prop, val) {
+    this.commands.map(function (prop, val) {
         res += '\n';
         res += val.cmd;
         res += val.desc ? ' - ' + val.desc : ' ';
@@ -169,45 +169,43 @@ Cli.prototype.usage = function () {
 };
 
 Cli.prototype.interact = function (promptStr) {
-    var self = this;
-    self._prompt = promptStr;
-    if (self._nextTick) {
+    this._prompt = promptStr;
+    if (this._nextTick) {
         return;
     }
-    self._nextTick = function () {
-        self.ask(self._prompt, function (val) {
-            self.parse(val);
-            if (typeof self._nextTick == 'function') {
-                self._nextTick();
+    this._nextTick = function () {
+        this.ask(this._prompt, function (val) {
+            this.parse(val);
+            if (typeof this._nextTick == 'function') {
+                this._nextTick();
             }
         });
     };
-    self._nextTick();
+    this._nextTick.call(this);
 };
 
 Cli.prototype.ask = function (str, mask, fn) {
     var stream = this.stream;
-    var self = this;
     // default mask
     if (typeof mask == 'function') {
         fn = mask;
         mask = null;
     }
     stream.setPrompt(str);
-    self.mask = mask;
-    if (self.mask != undefined) {
-        self._buf = '';
+    this.mask = mask;
+    if (this.mask != undefined) {
+        this._buf = '';
     }
     this.fn = function (line) {
-        if (self._buf) {
-            line = self._buf;
-            self._buf = '';
+        if (this._buf) {
+            line = this._buf;
+            this._buf = '';
         }
         var val = line.trim();
         if (!val.length) {
-            self.ask(str, mask, fn);
+            this.ask(str, mask, fn);
         } else {
-            defaultFn.call(self, val, fn);
+            defaultFn.call(this, val, fn);
         }
     };
     stream.prompt();
@@ -215,7 +213,7 @@ Cli.prototype.ask = function (str, mask, fn) {
 
 Cli.prototype.prompt = function (str, fn) {
     var self = this;
-    nextTick(this, str, null, function (line) {
+    nextTick.call(this, str, null, function (line) {
         fn ? fn(line) : self.parse(line);
     });
 };
@@ -226,14 +224,14 @@ Cli.prototype.password = function (str, mask, fn) {
         mask = '';
     }
     var self = this;
-    nextTick(this, str, mask, function (line) {
+    nextTick.call(this, str, mask, function (line) {
         fn ? fn(line) : self.parse(line);
     });
 };
 
 Cli.prototype.confirm = function (str, fn) {
     var self = this;
-    nextTick(this, str, null, function (line) {
+    nextTick.call(this, str, null, function (line) {
         fn ? fn(/^y|yes|ok|true$/i.test(line)) : self.parse(line);
     });
 };
@@ -253,13 +251,13 @@ Cli.prototype.command = function (cmd, desc, args, fn) {
             }
         }
     }
-    commands[p] = new command(cmd, desc, args, fn);
+    this.commands[p] = new command(cmd, desc, args, fn);
 };
 
 Cli.prototype.parse = function (str) {
     var resp = null;
     var self = this;
-    commands.map(function (prop, val) {
+    this.commands.map(function (prop, val) {
         var regex = new RegExp('^' + prop + '$');
         if (str.match(regex)) {
             var matches = regex.exec(str);
@@ -289,8 +287,8 @@ Cli.prototype.parse = function (str) {
         }
         return true;
     });
-    if (!resp && commands['*']) {
-        resp = commands['*'].listener(str);
+    if (!resp && this.commands['*']) {
+        resp = this.commands['*'].listener(str);
     }
     return resp;
 };
@@ -307,9 +305,9 @@ Cli.prototype.history = function (items) {
 module.exports = function (stream, tests) {
     var cli = new Cli(stream);
     if (tests) {
-        cli.commands = commands;
         cli.clean = function () {
-            commands = new Commands();
+            this.commands = new Commands();
+            this.stream = undefined;
         };
     }
     return cli;

@@ -1,6 +1,6 @@
 if (module == require.main) {
     var mochaPath = 'node_modules/mocha/bin/mocha';
-    var args = [mochaPath, '--colors', '--require', 'should', '--reporter', 'tap', __filename];
+    var args = [mochaPath, '--colors', '--growl', '--require', 'should', '--reporter', 'tap', __filename];
     var proc = require('child_process').spawn(process.argv[0], args, {stdio: 'inherit'});
     proc.on('close', function (code) {
         process.exit(code);
@@ -42,6 +42,11 @@ if (module == require.main) {
                         this.online(i);
                         this.write(i);
                     }
+                }
+            },
+            emit: function(evt, i) {
+                if (input && evt === 'line') {
+                    this.online(i);
                 }
             },
             once: nop,
@@ -93,6 +98,18 @@ if (module == require.main) {
             };
             cli.interact('i>');
         });
+        it('should allow negotiations during interact', function (done) {
+            var s = '';
+            cli.init(stream(['abc', 'aaa']));
+            cli.interact('i>');
+            cli.password('pass', function(pass) {
+                pass.should.eql('try', 'pass');
+            });
+            cli.init(stream(['try', '\\q']));
+            cli.stream.close = function () {
+                done();
+            };
+        });
         it('should print usage by command', function () {
             cli.init(stream('\\?', ['i>', 'usage:\nstart - start command\nstop \n' +
                 'exit, \\q - close shell and exit\nhelp, \\? - print this usage\nclear, \\c - clear the terminal screen']));
@@ -103,6 +120,7 @@ if (module == require.main) {
             cli.prompt('i>');
         });
         it('should print usage', function () {
+            cli.init(undefined);
             cli.command('start', 'start command', {}, function () {
             });
             cli.command('stop', function () {
@@ -119,6 +137,7 @@ if (module == require.main) {
             cli.prompt('i>');
         });
         it('should add history items', function () {
+            cli.init(undefined);
             cli.history(['a', 'b', 'c']);
             cli.history().should.eql(['c', 'b', 'a'], 'history');
         });
