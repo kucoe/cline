@@ -8,6 +8,7 @@ if (module == require.main) {
 } else {
 
     var cli = require('./index')(undefined, true);
+    var should = require('should');
 
     var nop = function () {
     };
@@ -113,18 +114,14 @@ if (module == require.main) {
         it('should print usage by command', function () {
             cli.init(stream('\\?', ['i>', 'usage:\nstart - start command\nstop \n' +
                 'exit, \\q - close shell and exit\nhelp, \\? - print this usage\nclear, \\c - clear the terminal screen']));
-            cli.command('start', 'start command', {}, function () {
-            });
-            cli.command('stop', function () {
-            });
+            cli.command('start', 'start command', {}, nop);
+            cli.command('stop', nop);
             cli.prompt('i>');
         });
         it('should print usage', function () {
             cli.init(undefined);
-            cli.command('start', 'start command', {}, function () {
-            });
-            cli.command('stop', function () {
-            });
+            cli.command('start', 'start command', {}, nop);
+            cli.command('stop', nop);
             cli.usage().should.eql('usage:\nstart - start command\nstop \n' +
                 'exit, \\q - close shell and exit\nhelp, \\? - print this usage\nclear, \\c - clear the terminal screen', 'usage');
         });
@@ -143,10 +140,8 @@ if (module == require.main) {
         });
         it('should fill completer', function (done) {
             cli.init();
-            cli.command('start', function () {
-            });
-            cli.command('stop', function () {
-            });
+            cli.command('start', nop);
+            cli.command('stop', nop);
             cli.stream.completer('s', function (err, res) {
                 res[0].should.eql(['start', 'stop'], 'completions');
                 done();
@@ -279,6 +274,27 @@ if (module == require.main) {
                 done();
             });
             cli.parse('#12x');
+        });
+        it('should support modes', function (done) {
+            cli.mode('a', function () {
+                done();
+            });
+            cli.mode('b', function () {
+                cli.parse('a');
+            });
+            cli.parse('b');
+        });
+        it('should clean commands on mode', function (done) {
+            cli.mode('a', function () {
+                should.not.exist(cli.parse('test'));
+                done();
+            });
+            cli.mode('b', function () {
+                cli.command('test', nop);
+                cli.parse('test').should.be.ok;
+                cli.parse('a');
+            });
+            cli.parse('b');
         });
     });
 }

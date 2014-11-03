@@ -28,7 +28,11 @@ var Commands = function () {
 
 var command = function (cmd, desc, args, fn) {
     this.cmd = cmd;
-    if (typeof desc == 'function') {
+    if (!fn && typeof args == 'function') {
+        fn = args;
+        args = {};
+    }
+    if (!fn && typeof desc == 'function') {
         fn = desc;
         desc = '';
         args = {};
@@ -124,6 +128,7 @@ var Cli = function (stream) {
     this.init(stream);
     EventEmitter.call(this);
     this.commands = new Commands();
+    this.modes = [];
 };
 
 require('util').inherits(Cli, EventEmitter);
@@ -236,12 +241,25 @@ Cli.prototype.confirm = function (str, fn) {
     });
 };
 
+Cli.prototype.mode = function (name, desc, args, fn) {
+    var c = new command(name, desc, args, fn);
+    this.modes.push(name);
+    var self = this;
+    this.command(c.cmd, c.desc, c.args, function (input, args) {
+        self.commands.map(function (prop, val) {
+            if (self.modes.indexOf(val.cmd) == -1) {
+                delete self.commands[prop];
+            }
+        });
+        var cb = c.listener;
+        cb && cb(input, args);
+        self._prompt = input + '>';
+    });
+};
+
 Cli.prototype.command = function (cmd, desc, args, fn) {
-    if (typeof args == 'function') {
-        fn = args;
-        args = {};
-    }
-    var p = cmd;
+    var c = new command(cmd, desc, args, fn);
+    var p = c.cmd;
     p = p.replace('?', '\\?').replace('$', '\\$').replace('+', '\\+').replace('^', '\\^').replace('*', '\\*');
     for (var prop in args) {
         if (args.hasOwnProperty(prop)) {
@@ -251,7 +269,7 @@ Cli.prototype.command = function (cmd, desc, args, fn) {
             }
         }
     }
-    this.commands[p] = new command(cmd, desc, args, fn);
+    this.commands[p] = new command(c.cmd, c.desc, c.args, c.listener);
 };
 
 Cli.prototype.parse = function (str) {
@@ -307,6 +325,7 @@ module.exports = function (stream, tests) {
     if (tests) {
         cli.clean = function () {
             this.commands = new Commands();
+            this.modes = [];
             this.stream = undefined;
         };
     }
