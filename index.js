@@ -44,8 +44,7 @@ var command = function (cmd, desc, args, fn) {
 
 var defaultFn = function (val, fn) {
     if ('\\q' === val || 'exit' === val) {
-        delete this._nextTick;
-        this.stream.close();
+        this.close();
     } else if ('\\?' === val || 'help' === val) {
         this.usage();
     } else if ('\\c' === val || 'clear' === val) {
@@ -255,6 +254,11 @@ Cli.prototype.mode = function (name, desc, args, fn) {
         cb && cb(input, args);
         self._prompt = input + '>';
     });
+};
+
+Cli.prototype.close = function () {
+    delete this._nextTick;
+    this.stream.close();
 };
 
 Cli.prototype.command = function (cmd, desc, args, fn) {
