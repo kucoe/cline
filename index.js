@@ -173,7 +173,7 @@ Cli.prototype.usage = function () {
 };
 
 Cli.prototype.interact = function (promptStr) {
-    this._prompt = promptStr;
+    this.setPrompt(promptStr);
     if (this._nextTick) {
         return;
     }
@@ -187,6 +187,11 @@ Cli.prototype.interact = function (promptStr) {
     };
     this._nextTick.call(this);
 };
+
+Cli.prototype.setPrompt = function (promptStr) {
+    this._prompt = promptStr;
+    return this._prompt;
+}
 
 Cli.prototype.ask = function (str, mask, fn) {
     var stream = this.stream;
