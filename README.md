@@ -98,6 +98,10 @@ password, confirm, input mask and (most interesting) regexp commands support.
   __interact(string)__ - start interactive prompt for user input. Every input is parsed for matching command and prompt again.
           Calling this method second time with different string will replace prompt string.
 
+  __setPrompt(string)__ - modifies prompt string, during interact.
+
+  __close()__ - closes cli and stream. Allows to continue program execution after some command matched.
+
 ### System commands
 
     clear or \c - clears the terminal screen
