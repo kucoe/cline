@@ -269,7 +269,9 @@ Cli.prototype.close = function () {
 Cli.prototype.command = function (cmd, desc, args, fn) {
     var c = new command(cmd, desc, args, fn);
     var p = c.cmd;
-    p = p.replace('?', '\\?').replace('$', '\\$').replace('+', '\\+').replace('^', '\\^').replace('*', '\\*');
+    if (p != '*') {
+      p = p.replace('?', '\\?').replace('$', '\\$').replace('+', '\\+').replace('^', '\\^').replace('*', '\\*');
+    }
     for (var prop in args) {
         if (args.hasOwnProperty(prop)) {
             var regex = new RegExp('{' + prop + '}', 'g');
