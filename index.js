@@ -192,6 +192,14 @@ Cli.prototype.setPrompt = function (promptStr) {
     this._prompt = promptStr;
     return this._prompt;
 }
+/**
+ *
+ * set whether to trim input strings
+ *
+ */
+Cli.prototype.setTrim = function (trim) {
+    this._trim = trim
+}
 
 Cli.prototype.ask = function (str, mask, fn) {
     var stream = this.stream;
@@ -210,8 +218,8 @@ Cli.prototype.ask = function (str, mask, fn) {
             line = this._buf;
             this._buf = '';
         }
-        var val = line.trim();
-        if (!val.length) {
+        var val = line;
+        if (!val.trim().length) {
             this.ask(str, mask, fn);
         } else {
             defaultFn.call(this, val, fn);
@@ -286,8 +294,11 @@ Cli.prototype.command = function (cmd, desc, args, fn) {
 Cli.prototype.parse = function (str) {
     var resp = null;
     var self = this;
+    if (this._trim !== false) {
+        str = str.trim();
+    }
     this.commands.map(function (prop, val) {
-        var regex = new RegExp('^' + prop + '$');
+        var regex = new RegExp('^\\s*' + prop + '\\s*$');
         if (str.match(regex)) {
             var matches = regex.exec(str);
             var main = matches.shift();
