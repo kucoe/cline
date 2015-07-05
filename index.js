@@ -192,6 +192,14 @@ Cli.prototype.setPrompt = function (promptStr) {
     this._prompt = promptStr;
     return this._prompt;
 }
+/**
+ *
+ * set whether to trim input strings
+ *
+ */
+Cli.prototype.setTrim = function (trim) {
+    this._trim = trim
+}
 
 Cli.prototype.ask = function (str, mask, fn) {
     var stream = this.stream;
@@ -205,16 +213,17 @@ Cli.prototype.ask = function (str, mask, fn) {
     if (this.mask != undefined) {
         this._buf = '';
     }
+    self = this
     this.fn = function (line) {
         if (this._buf) {
             line = this._buf;
             this._buf = '';
         }
-        var val = line.trim();
-        if (!val.length) {
+        var val = line;
+        if (self._trim !== false && !val.trim().length) {
             this.ask(str, mask, fn);
         } else {
-            defaultFn.call(this, val, fn);
+            defaultFn.call(this, line, fn);
         }
     };
     stream.prompt();
@@ -286,8 +295,11 @@ Cli.prototype.command = function (cmd, desc, args, fn) {
 Cli.prototype.parse = function (str) {
     var resp = null;
     var self = this;
+    if (this._trim !== false) {
+        str = str.trim();
+    }
     this.commands.map(function (prop, val) {
-        var regex = new RegExp('^' + prop + '$');
+        var regex = new RegExp('^\\s*' + prop + '\\s*$');
         if (str.match(regex)) {
             var matches = regex.exec(str);
             var main = matches.shift();
@@ -310,8 +322,8 @@ Cli.prototype.parse = function (str) {
                 }
             }
             var fn = val.listener;
-            resp = (fn ? fn(main, args) : true) || true;
-            self.emit('command', main, val.cmd, args);
+            resp = (fn ? fn(str, args) : true) || true;
+            self.emit('command', str, val.cmd, args);
             return false;
         }
         return true;

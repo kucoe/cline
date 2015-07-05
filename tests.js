@@ -189,6 +189,24 @@ if (module == require.main) {
             });
             cli.parse('#12');
         });
+        describe('trim mode', function (done) {
+          it('unset should trim spaces', function (done) {
+            cli.command('*', function (input) {
+                input.should.eql('unindented', 'unindented input');
+                done();
+            })
+            cli.parse('  unindented');
+          })
+          it('set should not trim spaces', function (done) {
+            cli.setTrim(false);
+            cli.command('*', function (input) {
+                input.should.eql('  indented', 'indented input');
+                done();
+            })
+            cli.parse('  indented');
+          })
+        })
+
 	it('should respect special chars', function (done) {
             cli.command('?{number}+{cmd}$', 'task command by number', {number: '\\d{1,3}', cmd: 'x|\\+|-|'}, function (input, args) {
                 args.number.should.eql(12, 'number');
