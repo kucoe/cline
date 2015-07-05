@@ -213,16 +213,17 @@ Cli.prototype.ask = function (str, mask, fn) {
     if (this.mask != undefined) {
         this._buf = '';
     }
+    self = this
     this.fn = function (line) {
         if (this._buf) {
             line = this._buf;
             this._buf = '';
         }
         var val = line;
-        if (!val.trim().length) {
+        if (self._trim !== false && !val.trim().length) {
             this.ask(str, mask, fn);
         } else {
-            defaultFn.call(this, val, fn);
+            defaultFn.call(this, line, fn);
         }
     };
     stream.prompt();
@@ -321,8 +322,8 @@ Cli.prototype.parse = function (str) {
                 }
             }
             var fn = val.listener;
-            resp = (fn ? fn(main, args) : true) || true;
-            self.emit('command', main, val.cmd, args);
+            resp = (fn ? fn(str, args) : true) || true;
+            self.emit('command', str, val.cmd, args);
             return false;
         }
         return true;
