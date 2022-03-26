@@ -109,6 +109,7 @@ var defaultStream = function () {
     var stream = require('readline').createInterface(process.stdin, process.stdout, completer, true);
     stream.print = function (msg) {
         console.log(msg);
+        stream.resume()
     };
     var self = this;
     var oldInsertString = stream._insertString;
@@ -208,6 +209,7 @@ Cli.prototype.ask = function (str, mask, fn) {
         fn = mask;
         mask = null;
     }
+
     stream.setPrompt(str);
     this.mask = mask;
     if (this.mask != undefined) {
